@@ -8,14 +8,17 @@ class Field:
         return str(self.value)
 
 class Name(Field):
-    pass  # Цей клас вже готовий завдяки Field
+    pass
 
 class Phone(Field):
     def __init__(self, value):
-        if len(value) == 10 and value.isdigit():
-            super().__init__(value)
-        else:
-            raise ValueError("Phone number should be 10 digits.")
+        if not self.validate(value):
+            raise ValueError("Phone number must have 10 digits.")
+        super().__init__(value)
+
+    @staticmethod
+    def validate(value):
+        return len(value) == 10 and value.isdigit()
 
 class Record:
     def __init__(self, name):
@@ -29,14 +32,14 @@ class Record:
         self.phones = [p for p in self.phones if p.value != phone]
 
     def edit_phone(self, old_phone, new_phone):
-        for p in self.phones:
-            if p.value == old_phone:
-                p.value = new_phone
+        for idx, phone in enumerate(self.phones):
+            if phone.value == old_phone:
+                self.phones[idx] = Phone(new_phone)
 
     def find_phone(self, phone):
         for p in self.phones:
             if p.value == phone:
-                return p.value
+                return p
         return None
 
     def __str__(self):
@@ -52,32 +55,3 @@ class AddressBook(UserDict):
     def delete(self, name):
         if name in self.data:
             del self.data[name]
-            return f"Record with name {name} deleted."
-        return f"No record found for name {name}."
-
-
-# Testing the above code
-book = AddressBook()
-
-john_record = Record("John")
-john_record.add_phone("1234567890")
-john_record.add_phone("5555555555")
-
-book.add_record(john_record)
-
-jane_record = Record("Jane")
-jane_record.add_phone("9876543210")
-book.add_record(jane_record)
-
-for name, record in book.data.items():
-    print(record)
-
-john = book.find("John")
-john.edit_phone("1234567890", "1112223333")
-
-print(john)  # Expected output: Contact name: John, phones: 1112223333; 5555555555
-
-found_phone = john.find_phone("5555555555")
-print(f"{john.name}: {found_phone}")  # Expected output: John: 5555555555
-
-book.delete("Jane")
