@@ -8,7 +8,6 @@ def input_error(func):
             return "Enter user name."
         except IndexError:
             return "Wrong number of parameters."
-        # можна додати обробку інших винятків за потреби
         except Exception as e:
             return f"Unknown error: {e}"
 
